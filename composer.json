@@ -13,8 +13,8 @@
 	},
 	"autoload": {
 		"psr-4": {
-			"RKR\\PHPStan\\": ["src/", "stubs/"],
-			"rkr\\": ["stubs/"]
+			"RKR\\PHPStan\\": "src/",
+			"rkr\\": "stubs/"
 		}
 	},
 	"autoload-dev": {
