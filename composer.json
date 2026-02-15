@@ -4,13 +4,16 @@
 	"type": "library",
 	"homepage": "https://github.com/rkrx/php-phpstan-extensions",
 	"preferred-install": "source",
+	"minimum-stability": "dev",
+	"prefer-stable": true,
 	"require": {
 		"php": ">= 8.2",
 		"phpstan/phpstan": "^2.1"
 	},
 	"autoload": {
 		"psr-4": {
-			"RKR\\PHPStan\\": "src/"
+			"RKR\\PHPStan\\": ["src/", "stubs/"],
+			"RKR\\": ["stubs/"]
 		}
 	},
 	"autoload-dev": {
@@ -22,6 +25,11 @@
 		"phpstan/phpstan": "PHPStan is a static analysis tool for PHP"
 	},
 	"scripts": {
-		"phpstan": "phpstan analyse -c phpstan.neon --xdebug --debug"
+		"phpstan": "phpstan analyse -c phpstan.neon --xdebug --debug",
+		"test": "phpunit -c phpunit.xml"
+	},
+	"require-dev": {
+		"dv-team/php-compact-code-style": "dev-main",
+		"phpunit/phpunit": "^13.0"
 	}
 }

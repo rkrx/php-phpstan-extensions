@@ -1,12 +1,12 @@
 <?php
 
-namespace Kir\PhpStan;
+namespace RKR\PHPStan;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use function PHPStan\Testing\assertType;
 
 use PHPStan\Testing\TypeInferenceTestCase;
-use Kir\PhpStan\Common\Merger;
+use RKR\PHPStan\Common\Merger;
 
 class ArrayMergeTypeNodeResolverExtensionTest extends TypeInferenceTestCase {
 	#[DataProvider('dataFileAsserts')]

@@ -2,19 +2,16 @@
 
 use function PHPStan\Testing\assertType;
 
-/** @phpstan-type TSomeType array{a: int} */
-/** @phpstan-type TOtherType array{b: string} */
-/** @phpstan-type TMergedType rkr-merge<TSomeType, TOtherType> */
-
-/** @var TMergedType $merged */
-$merged = ['a' => 1, 'b' => 'x'];
+/** @var int $a */
+$a = 1;
+/** @var string $b */
+$b = 'x';
+/** @phpstan-var \rkr\merge<array{a: int}, array{b: string}> $merged */
+$merged = [];
 
 assertType('array{a: int, b: string}', $merged);
 
-/** @phpstan-type TSomeTypeWithExtras array{a: int, b: string, c: float} */
-/** @phpstan-type TRemovedType rkr-remove-key<TSomeTypeWithExtras, b, c> */
-
-/** @var TRemovedType $removed */
-$removed = ['a' => 1];
+/** @phpstan-var \rkr\removeKey<array{a: int, b: string, c: float}, 'b'|'c'> $removed */
+$removed = [];
 
 assertType('array{a: int}', $removed);

@@ -1,7 +1,11 @@
 /*
+!/phpstan
 !/src
+!/stubs
 !/tests
 !/.gitignore
 !/composer.json
 !/phpstan.neon
 !/extension.neon
+!/phpunit.xml
+!/README.md

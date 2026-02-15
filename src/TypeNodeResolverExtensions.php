@@ -35,39 +35,55 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 			return null;
 		}
 
-		if(!$typeNode->type instanceof IdentifierTypeNode) {
-			return null;
+		$typeName = ltrim($typeNode->type->name, '\\');
+		$typeNameLower = strtolower($typeName);
+
+		if($typeNameLower === 'rkr\\merge' || $typeNameLower === 'rkrmerge' || $typeNameLower === 'rkr-merge') {
+			return $this->resolveMerge($typeNode, $nameScope);
 		}
 
-		return match ($typeNode->type->name) {
-			'rkr-merge' => $this->resolveMerge($typeNode, $nameScope),
-			'rkr-remove-key' => $this->resolveRemoveKey($typeNode, $nameScope),
-			default => null,
-		};
+		if(preg_match('/^rkr\\\\merge(\\d+)$/', $typeNameLower, $matches) === 1 || preg_match('/^rkrmerge(\\d+)$/', $typeNameLower, $matches) === 1) {
+			$expected = (int) $matches[1];
+			return $this->resolveMerge($typeNode, $nameScope, $expected);
+		}
+
+		if($typeNameLower === 'rkr\\removekey' || $typeNameLower === 'rkrremovekey' || $typeNameLower === 'rkr-remove-key') {
+			return $this->resolveRemoveKey($typeNode, $nameScope);
+		}
+
+		return null;
 	}
 
-	private function resolveMerge(GenericTypeNode $typeNode, NameScope $nameScope): Type {
+	private function resolveMerge(GenericTypeNode $typeNode, NameScope $nameScope, ?int $expectedCount = null): Type {
 		$genericTypes = $typeNode->genericTypes;
-		if(count($genericTypes) < 2) {
-			throw new InvalidArgumentException('rkr-merge requires at least two generic types.');
+		if($expectedCount !== null) {
+			if(count($genericTypes) !== $expectedCount) {
+				throw new InvalidArgumentException(sprintf('rkr\\merge%d requires exactly %d generic types.', $expectedCount, $expectedCount));
+			}
+		} elseif(count($genericTypes) < 2) {
+			throw new InvalidArgumentException('rkr\\merge requires at least two generic types.');
 		}
 
 		$resolvedTypes = array_map(
-			fn(TypeNode $node): Type => $this->unwrapTemplateType($this->typeNodeResolver->resolve($node, $nameScope)),
+			fn(TypeNode $node): Type => $this->unwrapTemplateType($this->typeNodeResolver->resolve($node, $nameScope), $nameScope),
 			$genericTypes
 		);
 
 		$result = array_shift($resolvedTypes);
+		if($result === null) {
+			return new ErrorType();
+		}
+
 		foreach($resolvedTypes as $nextType) {
-			$result = $this->mergeTypes($result, $nextType);
+			$result = $this->mergeTypes($result, $nextType, $nameScope);
 		}
 
 		return $result;
 	}
 
-	private function mergeTypes(Type $left, Type $right): Type {
-		$left = $this->unwrapTemplateType($left);
-		$right = $this->unwrapTemplateType($right);
+	private function mergeTypes(Type $left, Type $right, NameScope $nameScope): Type {
+		$left = $this->unwrapTemplateType($left, $nameScope);
+		$right = $this->unwrapTemplateType($right, $nameScope);
 
 		$leftConstantArrays = $left->getConstantArrays();
 		$rightConstantArrays = $right->getConstantArrays();
@@ -117,11 +133,11 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 	private function resolveRemoveKey(GenericTypeNode $typeNode, NameScope $nameScope): Type {
 		$genericTypes = $typeNode->genericTypes;
 		if(count($genericTypes) < 2) {
-			throw new InvalidArgumentException('rkr-remove-key requires an array type and at least one key.');
+			throw new InvalidArgumentException('rkr\\removeKey requires an array type and at least one key.');
 		}
 
 		$arrayTypeNode = array_shift($genericTypes);
-		$arrayType = $this->unwrapTemplateType($this->typeNodeResolver->resolve($arrayTypeNode, $nameScope));
+		$arrayType = $this->unwrapTemplateType($this->typeNodeResolver->resolve($arrayTypeNode, $nameScope), $nameScope);
 		if($arrayType->isArray()->no()) {
 			return new ErrorType();
 		}
@@ -179,7 +195,7 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 		}
 
 		$resolved = $this->typeNodeResolver->resolve($keyNode, $nameScope);
-		$resolved = $this->unwrapTemplateType($resolved);
+		$resolved = $this->unwrapTemplateType($resolved, $nameScope);
 
 		return $this->extractConstantKeyTypes($resolved);
 	}
@@ -195,8 +211,11 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 
 		foreach($type->getConstantScalarTypes() as $scalarType) {
 			$arrayKeyType = $scalarType->toArrayKey();
-			if($arrayKeyType instanceof ConstantStringType || $arrayKeyType instanceof ConstantIntegerType) {
-				$keys[] = $arrayKeyType;
+			foreach($arrayKeyType->getConstantStrings() as $stringType) {
+				$keys[] = $stringType;
+			}
+			foreach(\PHPStan\Type\TypeUtils::getConstantIntegers($arrayKeyType) as $intType) {
+				$keys[] = $intType;
 			}
 		}
 
@@ -211,11 +230,8 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 		$deduped = [];
 		$seen = [];
 		foreach($keyTypes as $keyType) {
-			if($keyType instanceof ConstantStringType) {
-				$id = 's:' . $keyType->getValue();
-			} else {
-				$id = 'i:' . $keyType->getValue();
-			}
+			$value = $keyType->getValue();
+			$id = (is_string($value) ? 's:' : 'i:') . $value;
 			if(isset($seen[$id])) {
 				continue;
 			}
@@ -261,8 +277,13 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 		return $builder->getArray();
 	}
 
-	private function unwrapTemplateType(Type $type): Type {
+	private function unwrapTemplateType(Type $type, NameScope $nameScope): Type {
 		if($type instanceof TemplateType) {
+			$resolved = $nameScope->resolveTemplateTypeName($type->getName());
+			if($resolved !== null) {
+				return $resolved;
+			}
+
 			return $type->getBound();
 		}
 

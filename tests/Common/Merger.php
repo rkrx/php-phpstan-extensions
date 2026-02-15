@@ -1,19 +1,15 @@
 <?php
 
-namespace Kir\PhpStan\Common;
+namespace RKR\PHPStan\Common;
 
 use function PHPStan\Testing\assertType;
 
-/**
- * @template T of array<string, mixed>
- * @template U of array<string, mixed>
- */
 class Merger {
 	/**
-	 * @param T $a
-	 * @param U $b
+	 * @param array{a: int} $a
+	 * @param array{b: string} $b
 	 *
-	 * @return T&U
+	 * @return \rkr\merge<array{a: int}, array{b: string}>
 	 */
 	function merge(array $a, array $b): array {
 		return array_merge($a, $b);
@@ -23,7 +19,6 @@ class Merger {
 $x = ['a' => 123];
 $y = ['b' => '567'];
 
-/** @var Merger<array{a: int}, array{b: string}> $merger */
 $merger = new Merger();
 $z = $merger->merge($x, $y);
 

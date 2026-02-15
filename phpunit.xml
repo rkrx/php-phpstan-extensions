@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	bootstrap="vendor/autoload.php"
+	colors="true"
+	beStrictAboutOutputDuringTests="true"
+	beStrictAboutTestsThatDoNotTestAnything="true"
+	failOnRisky="true"
+	failOnWarning="true"
+	executionOrder="depends,defects"
+	cacheDirectory=".phpunit.cache"
+>
+	<testsuites>
+		<testsuite name="Unit">
+			<directory>tests</directory>
+		</testsuite>
+	</testsuites>
+	<source ignoreIndirectDeprecations="true">
+		<include>
+			<directory suffix=".php">src</directory>
+			<directory suffix=".php">tests</directory>
+		</include>
+	</source>
+</phpunit>

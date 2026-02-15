@@ -1,0 +1,30 @@
+<?php
+
+namespace rkr;
+
+/**
+ * Dummy class for IDEs.
+ *
+ * @template T1 of array
+ * @template T2 of array
+ * @template T3 of array
+ * @template T4 of array
+ * @template T5 of array
+ * @template T6 of array
+ * @template T7 of array
+ * @template T8 of array
+ * @template T9 of array
+ * @template T10 of array
+ * @template T11 of array
+ * @template T12 of array
+ * @template T13 of array
+ * @template T14 of array
+ * @template T15 of array
+ * @template T16 of array
+ * @template T17 of array
+ * @template T18 of array
+ * @template T19 of array
+ * @template T20 of array
+ */
+final class merge20 {
+}
