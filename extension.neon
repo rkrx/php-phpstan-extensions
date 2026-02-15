@@ -1,0 +1,5 @@
+services:
+	-
+	    class: RKR\PHPStan\TypeNodeResolverExtensions
+	    tags:
+	        - phpstan.phpDoc.typeNodeResolverExtension
