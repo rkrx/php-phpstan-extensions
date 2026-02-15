@@ -47,6 +47,10 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 			return $this->resolveMerge($typeNode, $nameScope, $expected);
 		}
 
+		if($typeNameLower === 'rkr\\addkey' || $typeNameLower === 'rkraddkey') {
+			return $this->resolveAddKey($typeNode, $nameScope);
+		}
+
 		if($typeNameLower === 'rkr\\removekey' || $typeNameLower === 'rkrremovekey' || $typeNameLower === 'rkr-remove-key') {
 			return $this->resolveRemoveKey($typeNode, $nameScope);
 		}
@@ -156,6 +160,49 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 		$updatedTypes = [];
 		foreach($constantArrays as $array) {
 			$updatedTypes[] = $this->removeKeysFromConstantArray($array, $removeValues);
+		}
+
+		return TypeCombinator::union(...$updatedTypes);
+	}
+
+	private function resolveAddKey(GenericTypeNode $typeNode, NameScope $nameScope): Type {
+		$genericTypes = $typeNode->genericTypes;
+		if(count($genericTypes) !== 3) {
+			throw new InvalidArgumentException('rkr\\addKey requires exactly three generic types.');
+		}
+
+		$subjectNode = $genericTypes[0];
+		$keyNode = $genericTypes[1];
+		$valueNode = $genericTypes[2];
+
+		$subjectType = $this->unwrapTemplateType($this->typeNodeResolver->resolve($subjectNode, $nameScope), $nameScope);
+		if($subjectType->isArray()->no()) {
+			return new ErrorType();
+		}
+
+		$keyTypes = $this->resolveKeyType($keyNode, $nameScope);
+		if(count($keyTypes) !== 1) {
+			return new ErrorType();
+		}
+		$keyType = $keyTypes[0];
+
+		$valueType = $this->unwrapTemplateType($this->typeNodeResolver->resolve($valueNode, $nameScope), $nameScope);
+
+		$constantArrays = $subjectType->getConstantArrays();
+		if($constantArrays === []) {
+			return new ArrayType(
+				TypeCombinator::union($subjectType->getIterableKeyType(), $keyType),
+				TypeCombinator::union($subjectType->getIterableValueType(), $valueType)
+			);
+		}
+
+		$updatedTypes = [];
+		foreach($constantArrays as $array) {
+			$builder = ConstantArrayTypeBuilder::createEmpty();
+			$builder->disableArrayDegradation();
+			$this->appendConstantArray($builder, $array);
+			$builder->setOffsetValueType($keyType, $valueType, false);
+			$updatedTypes[] = $builder->getArray();
 		}
 
 		return TypeCombinator::union(...$updatedTypes);

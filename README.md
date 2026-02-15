@@ -34,6 +34,9 @@ $merged = ['a' => 1, 'b' => 'x'];
 
 assertType('array{a: int, b: string}', $merged);
 
+/** @phpstan-var \rkr\addKey<array{a: int}, 'b', array<string, mixed>> $added */
+$added = ['a' => 1, 'b' => []];
+
 /** @phpstan-var \rkr\removeKey<array{a: int, b: string, c: float}, 'b'|'c'> $removed */
 $removed = ['a' => 1];
 
@@ -56,6 +59,15 @@ $value = ['a' => 1, 'b' => 'x'];
 $value3 = ['a' => 1, 'b' => 'x', 'c' => 1.5];
 ```
 
+### rkr\\addKey
+
+`\rkr\addKey<TSubject, TKey, TValue>` adds a constant key to an array shape.
+
+```php
+/** @phpstan-var \rkr\addKey<array{a: int}, 'b', array<string, mixed>> $value */
+$value = ['a' => 1, 'b' => []];
+```
+
 ### rkr\\removeKey
 
 `\rkr\removeKey<TArray, TKey>` removes one or more keys from a constant array shape.
@@ -72,6 +84,7 @@ $value = ['a' => 1];
 - Type functions
 - `rkr\\merge<...>` and `rkr\\merge3` ... `rkr\\merge20`
   - Returns a merged array type. If both inputs are constant arrays, the result is a constant array shape union.
+- `rkr\\addKey<...>`
 - `rkr\\removeKey<...>`
   - Returns the array type with the specified keys removed when the input is a constant array shape.
 
@@ -98,6 +111,7 @@ services:
 
 - If `rkr\\merge` receives non-array types, it resolves to an error type in PHPStan.
 - If `rkr\\merge3` ... `rkr\\merge20` do not receive the exact number of generic types, they resolve to an error type in PHPStan.
+- If `rkr\\addKey` is given a non-array as the first generic type or a non-constant key, it resolves to an error type.
 - If `rkr\\removeKey` is given a non-array as the first generic type, it resolves to an error type.
 - If keys cannot be resolved to constant strings or integers, the original array type is preserved.
 
