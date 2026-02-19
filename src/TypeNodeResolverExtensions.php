@@ -62,10 +62,10 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 		$genericTypes = $typeNode->genericTypes;
 		if($expectedCount !== null) {
 			if(count($genericTypes) !== $expectedCount) {
-				throw new InvalidArgumentException(sprintf('rkr\\merge%d requires exactly %d generic types.', $expectedCount, $expectedCount));
+				throw new InvalidArgumentException(sprintf('rkrMerge%d requires exactly %d generic types.', $expectedCount, $expectedCount));
 			}
 		} elseif(count($genericTypes) < 2) {
-			throw new InvalidArgumentException('rkr\\merge requires at least two generic types.');
+			throw new InvalidArgumentException('rkrMerge requires at least two generic types.');
 		}
 
 		$resolvedTypes = array_map(
@@ -137,7 +137,7 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 	private function resolveRemoveKey(GenericTypeNode $typeNode, NameScope $nameScope): Type {
 		$genericTypes = $typeNode->genericTypes;
 		if(count($genericTypes) < 2) {
-			throw new InvalidArgumentException('rkr\\removeKey requires an array type and at least one key.');
+			throw new InvalidArgumentException('rkrRemoveKey requires an array type and at least one key.');
 		}
 
 		$arrayTypeNode = array_shift($genericTypes);
@@ -168,7 +168,7 @@ final class TypeNodeResolverExtensions implements TypeNodeResolverExtension, Typ
 	private function resolveAddKey(GenericTypeNode $typeNode, NameScope $nameScope): Type {
 		$genericTypes = $typeNode->genericTypes;
 		if(count($genericTypes) !== 3) {
-			throw new InvalidArgumentException('rkr\\addKey requires exactly three generic types.');
+			throw new InvalidArgumentException('rkrAddKey requires exactly three generic types.');
 		}
 
 		$subjectNode = $genericTypes[0];

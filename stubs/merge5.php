@@ -1,7 +1,5 @@
 <?php
 
-namespace rkr;
-
 /**
  * Dummy class for IDEs.
  *
@@ -11,5 +9,5 @@ namespace rkr;
  * @template T4 of array
  * @template T5 of array
  */
-final class merge5 {
+final class rkrMerge5 {
 }

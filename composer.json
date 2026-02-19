@@ -1,7 +1,7 @@
 {
 	"name": "rkr/phpstan-extensions",
 	"description": "PHPStan extensions",
-	"type": "library",
+	"type": "phpstan-extension",
 	"homepage": "https://github.com/rkrx/php-phpstan-extensions",
 	"license": "MIT",
 	"preferred-install": "source",
@@ -12,10 +12,8 @@
 		"phpstan/phpstan": "^2.1"
 	},
 	"autoload": {
-		"psr-4": {
-			"RKR\\PHPStan\\": "src/",
-			"rkr\\": "stubs/"
-		}
+		"psr-4": {"RKR\\PHPStan\\": "src/"},
+		"classmap": ["stubs/"]
 	},
 	"autoload-dev": {
 		"psr-4": {

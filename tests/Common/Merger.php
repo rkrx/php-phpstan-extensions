@@ -9,7 +9,7 @@ class Merger {
 	 * @param array{a: int} $a
 	 * @param array{b: string} $b
 	 *
-	 * @return \rkr\merge<array{a: int}, array{b: string}>
+	 * @return \rkrMerge<array{a: int}, array{b: string}>
 	 */
 	function merge(array $a, array $b): array {
 		return array_merge($a, $b);

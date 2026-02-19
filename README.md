@@ -29,15 +29,15 @@ includes:
 
 use function PHPStan\Testing\assertType;
 
-/** @phpstan-var \rkr\merge<array{a: int}, array{b: string}> $merged */
+/** @phpstan-var \rkrMerge<array{a: int}, array{b: string}> $merged */
 $merged = ['a' => 1, 'b' => 'x'];
 
 assertType('array{a: int, b: string}', $merged);
 
-/** @phpstan-var \rkr\addKey<array{a: int}, 'b', array<string, mixed>> $added */
+/** @phpstan-var \rkrAddKey<array{a: int}, 'b', array<string, mixed>> $added */
 $added = ['a' => 1, 'b' => []];
 
-/** @phpstan-var \rkr\removeKey<array{a: int, b: string, c: float}, 'b'|'c'> $removed */
+/** @phpstan-var \rkrRemoveKey<array{a: int, b: string, c: float}, 'b'|'c'> $removed */
 $removed = ['a' => 1];
 
 assertType('array{a: int}', $removed);
@@ -45,47 +45,47 @@ assertType('array{a: int}', $removed);
 
 **Usage**
 
-### rkr\\merge
+### rkrMerge
 
-`\rkr\merge<TLeft, TRight>` merges array types and preserves constant array shapes when possible.
+`\rkrMerge<TLeft, TRight>` merges array types and preserves constant array shapes when possible.
 
-For 3+ arrays, use the convenience aliases `\rkr\merge3` ... `\rkr\merge20`.
+For 3+ arrays, use the convenience aliases `\rkrMerge3` ... `\rkrMerge20`.
 
 ```php
-/** @phpstan-var \rkr\merge<array{a: int}, array{b: string}> $value */
+/** @phpstan-var \rkrMerge<array{a: int}, array{b: string}> $value */
 $value = ['a' => 1, 'b' => 'x'];
 
-/** @phpstan-var \rkr\merge3<array{a: int}, array{b: string}, array{c: float}> $value3 */
+/** @phpstan-var \rkrMerge3<array{a: int}, array{b: string}, array{c: float}> $value3 */
 $value3 = ['a' => 1, 'b' => 'x', 'c' => 1.5];
 ```
 
-### rkr\\addKey
+### rkrAddKey
 
-`\rkr\addKey<TSubject, TKey, TValue>` adds a constant key to an array shape.
+`\rkrAddKey<TSubject, TKey, TValue>` adds a constant key to an array shape.
 
 ```php
-/** @phpstan-var \rkr\addKey<array{a: int}, 'b', array<string, mixed>> $value */
+/** @phpstan-var \rkrAddKey<array{a: int}, 'b', array<string, mixed>> $value */
 $value = ['a' => 1, 'b' => []];
 ```
 
-### rkr\\removeKey
+### rkrRemoveKey
 
-`\rkr\removeKey<TArray, TKey>` removes one or more keys from a constant array shape.
+`\rkrRemoveKey<TArray, TKey>` removes one or more keys from a constant array shape.
 
 Pass multiple keys as a union of constant strings/integers (for example `'a'|'b'|3`).
 
 ```php
-/** @phpstan-var \rkr\removeKey<array{a: int, b: string, c: float}, 'b'|'c'> $value */
+/** @phpstan-var \rkrRemoveKey<array{a: int, b: string, c: float}, 'b'|'c'> $value */
 $value = ['a' => 1];
 ```
 
 **Public API**
 
 - Type functions
-- `rkr\\merge<...>` and `rkr\\merge3` ... `rkr\\merge20`
+- `rkrMerge<...>` and `rkrMerge3` ... `rkrMerge20`
   - Returns a merged array type. If both inputs are constant arrays, the result is a constant array shape union.
-- `rkr\\addKey<...>`
-- `rkr\\removeKey<...>`
+- `rkrAddKey<...>`
+- `rkrRemoveKey<...>`
   - Returns the array type with the specified keys removed when the input is a constant array shape.
 
 **Configuration**
@@ -109,10 +109,10 @@ services:
 
 **Error Handling**
 
-- If `rkr\\merge` receives non-array types, it resolves to an error type in PHPStan.
-- If `rkr\\merge3` ... `rkr\\merge20` do not receive the exact number of generic types, they resolve to an error type in PHPStan.
-- If `rkr\\addKey` is given a non-array as the first generic type or a non-constant key, it resolves to an error type.
-- If `rkr\\removeKey` is given a non-array as the first generic type, it resolves to an error type.
+- If `rkrMerge` receives non-array types, it resolves to an error type in PHPStan.
+- If `rkrMerge3` ... `rkrMerge20` do not receive the exact number of generic types, they resolve to an error type in PHPStan.
+- If `rkrAddKey` is given a non-array as the first generic type or a non-constant key, it resolves to an error type.
+- If `rkrRemoveKey` is given a non-array as the first generic type, it resolves to an error type.
 - If keys cannot be resolved to constant strings or integers, the original array type is preserved.
 
 **Testing**

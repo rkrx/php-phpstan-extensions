@@ -1,7 +1,5 @@
 <?php
 
-namespace rkr;
-
 /**
  * Dummy class for IDEs.
  *
@@ -9,5 +7,5 @@ namespace rkr;
  * @template TKey of array-key
  * @template TValue
  */
-final class addKey {
+final class rkrAddKey {
 }
