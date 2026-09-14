@@ -20,6 +20,11 @@
 			"RKR\\PHPStan\\": "tests/"
 		}
 	},
+	"extra": {
+		"phpstan": {
+			"includes": ["extension.neon"]
+		}
+	},
 	"suggest": {
 		"phpstan/phpstan": "PHPStan is a static analysis tool for PHP"
 	},
