@@ -9,7 +9,7 @@
 	"prefer-stable": true,
 	"require": {
 		"php": ">= 8.2",
-		"phpstan/phpstan": "^2.1"
+		"phpstan/phpstan": ">= 2.1"
 	},
 	"autoload": {
 		"psr-4": {"RKR\\PHPStan\\": "src/"},

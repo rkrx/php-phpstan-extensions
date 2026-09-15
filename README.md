@@ -1,6 +1,6 @@
 # rkr/phpstan-extensions
 
-PHPStan type-node resolver extensions that add custom type functions for array merging and key removal.
+PHPStan type-node resolver extensions that add custom type functions for array merging, key addition, and key removal.
 
 **Status**
 - PHP: 8.2+
@@ -79,6 +79,32 @@ Pass multiple keys as a union of constant strings/integers (for example `'a'|'b'
 $value = ['a' => 1];
 ```
 
+### Generic builders
+
+All three operations preserve template arguments until PHPStan knows their concrete
+values. This also works with nested operations and chained builder calls:
+
+```php
+/**
+ * @template TRow of array<string, mixed>
+ */
+interface RowBuilder {
+    /**
+     * @template TName of literal-string
+     * @param TName $name
+     * @return self<\rkrAddKey<TRow, TName, string|null>>
+     */
+    public function addStringKey(string $name): self;
+
+    /** @return TRow */
+    public function row(): array;
+}
+```
+
+Starting with `RowBuilder<array{}>`, `addStringKey('ean')->row()` resolves to
+`array{ean: string|null}`. Template names used as keys remain templates; bare
+non-template identifiers continue to represent literal keys.
+
 **Public API**
 
 - Type functions
@@ -111,15 +137,25 @@ services:
 
 - If `rkrMerge` receives non-array types, it resolves to an error type in PHPStan.
 - If `rkrMerge3` ... `rkrMerge20` do not receive the exact number of generic types, they resolve to an error type in PHPStan.
-- If `rkrAddKey` is given a non-array as the first generic type or a non-constant key, it resolves to an error type.
+- If `rkrAddKey` is given a non-array as the first generic type or multiple constant keys, it resolves to an error type.
+- A generic key widened to `string` or `int` produces an array bound with the combined key and value types. Once a literal is available, the exact shape is retained.
 - If `rkrRemoveKey` is given a non-array as the first generic type, it resolves to an error type.
 - If keys cannot be resolved to constant strings or integers, the original array type is preserved.
 
 **Testing**
 
 ```sh
+composer test
 composer run phpstan
 ```
+
+The inference tests cover concrete shapes, template substitution, nested merges,
+chained builders, overwrites, optional keys, and key removal. Deferred operations
+use PHPStan's internal `CompoundType`/`LateResolvableTypeTrait` protocol because
+there is no public base class for this kind of operation. The two corresponding
+API-compatibility warnings are acknowledged locally in `ArrayOperationType`;
+PHPStan upgrades must be checked with these tests. See PHPStan's
+[backward compatibility promise](https://phpstan.org/developing-extensions/backward-compatibility-promise).
 
 **Contributing**
 

@@ -31,6 +31,7 @@ class ArrayMergeTypeNodeResolverExtensionTest extends TypeInferenceTestCase {
 	public static function dataFileAsserts(): iterable {
 		yield from self::gatherAssertTypes(__DIR__ . '/Common/Merger.php');
 		yield from self::gatherAssertTypes(__DIR__ . '/Common/CustomOperators.php');
+		yield from self::gatherAssertTypes(__DIR__ . '/Common/GenericOperators.php');
 	}
 	
 	public static function getAdditionalConfigFiles(): array {
