@@ -15,7 +15,8 @@ composer require --dev rkr/phpstan-extensions
 
 **Quick Start**
 
-1. Register the extension in your PHPStan config:
+1. With `phpstan/extension-installer`, Composer registers the extension automatically.
+   Otherwise, register it in your PHPStan config:
 
 ```neon
 includes:
@@ -132,6 +133,15 @@ services:
 		tags:
 			- phpstan.phpDoc.typeNodeResolverExtension
 ```
+
+### Composer discovery
+
+Keep the PHPStan requirement bounded (`^2.1`, which includes PHPStan 2.2).
+The extension installer skips packages whose PHPStan version constraint has no
+lower or upper bound. An unbounded requirement such as `>= 2.1` can therefore
+leave the extension installed but inactive, even with correct `extra.phpstan.includes`.
+After updating the package, verify that `rkr/phpstan-extensions` appears in
+`vendor/phpstan/extension-installer/src/GeneratedConfig.php`.
 
 **Error Handling**
 
